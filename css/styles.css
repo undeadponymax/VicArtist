@@ -14,7 +14,8 @@
 html, body {
   margin: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  height: auto; /* allow document to grow -> scrolling works */
 }
 
 body {
@@ -230,112 +231,93 @@ img {
   }
 }
 
-/* ---------- GALLERY ---------- */
-
-/* Let galleries use full width, but keep text pages readable */
-.page-content { max-width: 60ch; }
+/* ===== Gallery base ===== */
 .page-gallery .page-content { max-width: none; }
+html, body { overflow-x: hidden; }
 
-/* Grid: never overflow horizontally */
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
-  gap: 2.5rem;
   margin-top: 2rem;
 }
 
-/* Make grid items allowed to shrink (prevents overflow) */
-.gallery-item,
-.gallery-open {
-  min-width: 0;
-}
-
-.gallery-item {
-  display: grid;
-  gap: 0.9rem;
+/* Each item */
+.g-item {
   margin: 0;
 }
 
-.gallery-open {
-  padding: 0;
+.g-open {
+  display: inline-block;      /* important: shrink-wrap to image size */
+  padding: 14px;              /* frame thickness */
+  background: #fff;           /* frame color */
   border: 0;
-  background: transparent;
-  width: 100%;
-  cursor: pointer;
-  text-align: left;
-}
-
-/* Frame: fixed height on desktop */
-.gallery-frame {
-  height: 340px;          /* <-- change this to taste */
-  background: #fff;
-  padding: 18px;
   border-radius: 0;
+  cursor: pointer;
   box-shadow:
     0 12px 30px rgba(0,0,0,.20),
     0 2px 6px rgba(0,0,0,.12);
-  transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.gallery-mat {
-  width: 100%;
-  height: 100%;
-  background: #f7f7f7;
-  padding: 12px;
-  border-radius: 0;
-  overflow: hidden;
-}
-
-/* No cropping: contain for rectangular art */
-.gallery-mat img {
-  width: 100%;
-  height: 100%;
+.g-img {
   display: block;
-  object-fit: contain;   /* <-- key change */
   border-radius: 0;
-}
-
-/* Hover */
-.gallery-open:hover .gallery-frame {
-  transform: translateY(-3px);
-  box-shadow:
-    0 16px 40px rgba(0,0,0,.26),
-    0 4px 10px rgba(0,0,0,.14);
 }
 
 /* Caption */
-.gallery-caption {
+.g-cap {
+  margin-top: .8rem;
   font-family: "Poiret One", sans-serif;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   line-height: 1.25;
   color: #fff;
-  opacity: 0.95;
+  opacity: .95;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-/* Mobile: fixed width (1 column), height becomes natural */
-@media (max-width: 768px) {
+
+/* ===== Mobile: 2-column masonry (same width, varying height) ===== */
+@media (max-width: 900px) {
   .gallery {
-    grid-template-columns: 1fr;
+    column-count: 2;
+    column-gap: 1.5rem;
   }
 
-  .gallery-frame {
-    height: auto;
+  .g-item {
+    break-inside: avoid;
+    margin-bottom: 2rem;
+    display: inline-block;
+    width: 100%;
   }
 
-  .gallery-mat {
-    aspect-ratio: 4 / 5; /* optional: nicer consistent block */
+  .g-open {
+    width: 100%;              /* frame matches column width */
+    box-sizing: border-box;
+  }
+
+  .g-img {
+    width: 100%;
+    height: auto;             /* natural height */
   }
 }
 
+/* Desktop: justified rows */
+@media (min-width: 901px) {
+  .gallery {
+    column-count: initial;   /* ensure mobile columns are off */
+  }
 
-/* ---------- CAPTION ---------- */
-.gallery-caption {
-  font-family: "Poiret One", sans-serif;
-  font-size: 1.15rem;
-  line-height: 1.2;
-  color: #fff;
-  opacity: 0.95;
+  .g-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: flex-start;
+  }
+
+  .g-row .g-item {
+    flex: 0 0 auto;
+  }
 }
+
 
 /* ---------- LIGHTBOX ---------- */
 .lightbox {
@@ -401,4 +383,13 @@ html, body {
 /* Extra safety for gallery pages */
 .page-gallery {
   overflow-x: hidden;
+}
+
+/* ===== Home: mobile fixes ===== */
+@media (max-width: 900px) {
+  .hero {
+    height: auto;
+    min-height: 100vh; /* at least one screen */
+    padding-bottom: 2rem;
+  }
 }
